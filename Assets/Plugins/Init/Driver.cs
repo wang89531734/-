@@ -1,4 +1,14 @@
 #if !UNITY_IPHONE
+/*----------------------------------------------------------------
+// Copyright (C) 2013 广州，爱游
+//
+// 模块名：Driver
+// 创建者：Steven Yang
+// 修改者列表：
+// 创建日期：
+// 模块描述：
+//----------------------------------------------------------------*/
+
 using UnityEngine;
 
 using Mogo.Util;
@@ -6,6 +16,7 @@ using System;
 using System.Collections;
 using System.Net;
 using System.IO;
+
 
 public class Driver : MonoBehaviour
 {
@@ -36,8 +47,8 @@ public class Driver : MonoBehaviour
         LoggerHelper.CurrentLogLevels = LogLevel.INFO | LogLevel.ERROR | LogLevel.CRITICAL | LogLevel.EXCEPT;// | LogLevel.WARNING 
 #endif
         LoggerHelper.Info("--------------------------------------Game Start!-----------------------------------------");
-        SystemSwitch.InitSystemSwitch();
-        Screen.sleepTimeout = (int)SleepTimeout.NeverSleep;
+        SystemSwitch.InitSystemSwitch();//初始化系统开关
+        Screen.sleepTimeout = (int)SleepTimeout.NeverSleep;//息屏时间
         DontDestroyOnLoad(transform.gameObject);
         Instance = this;
         gameObject.AddComponent<DriverLib>();
@@ -45,97 +56,141 @@ public class Driver : MonoBehaviour
         DefaultUI.InitLanguageInfo();
         GameObject.Find("MogoForwardLoadingUIPanel").AddComponent<MogoForwardLoadingUIManager>();
         TryToInit();
-        InvokeRepeating("Tick", 1, 0.02f);
+        //InvokeRepeating("Tick", 1, 0.02f);
         gameObject.AddComponent<AudioListener>();
     }
 
     void TryToInit()
     {
         InitLoaderLib();
+        //if (Application.internetReachability != NetworkReachability.NotReachable)
+        //{
+        //    var checkTimeout = new CheckTimeout();
+        //    DefaultUI.SetLoadingStatusTip(DefaultUI.dataMap.Get(13).content);//正在检查网络
+        //    checkTimeout.AsynIsNetworkTimeout((result) =>
+        //    {
+        //        Invoke(() =>
+        //        {
+        //            if (result)
         DoInit();
+        //            else
+        //            {
+        //                ForwardLoadingMsgBox.Instance.ShowRetryMsgBox(DefaultUI.dataMap[52].content, (isOk) =>
+        //                {
+        //                    if (isOk)
+        //                        TryToInit();
+        //                    else
+        //                        Application.Quit();
+        //                });
+        //            }
+        //        });
+        //    });
+
+        //}
+        //        else
+        //        {
+        //            var languageData = DefaultUI.dataMap;
+        //            ForwardLoadingMsgBox.Instance.ShowMsgBox(languageData[50].content, languageData[51].content, languageData[52].content, (OnOkButton) =>
+        //            {
+        //                if (OnOkButton)
+        //                {
+        //                    ForwardLoadingMsgBox.Instance.Hide();
+        //                    TryToInit();
+        //                }
+        //                else
+        //                {
+        //#if UNITY_ANDROID&&!UNITY_EDITOR
+        //                    AndroidJavaClass jc = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+        //                    AndroidJavaObject m_mainActivity = jc.GetStatic<AndroidJavaObject>("currentActivity");
+        //                    m_mainActivity.Call("gotoNetworkSetting");
+        //#endif
+        //                }
+        //            });
+        //        }
     }
 
     void DoInit()
     {
         DefaultUI.SetLoadingStatusTip(DefaultUI.dataMap.Get(4).content);//数据读取中…
-        var loadCfgSuccess = SystemConfig.Init();
-        if (!loadCfgSuccess)
-        {
-            ForwardLoadingMsgBox.Instance.ShowRetryMsgBox(DefaultUI.dataMap[53].content, (isOk) =>
-            {
-                if (isOk)
-                    DoInit();
-                else
-                    Application.Quit();
-            });
-            return;
-        }
-        if (SystemSwitch.ReleaseMode)
-        {
-            //第一次导出资源
-            ResourceIndexInfo.Instance.Init(Application.streamingAssetsPath + "/ResourceIndexInfo.txt", () =>
-            {
-                //如果是完整包(判断ResourceIndexInfo.txt是否存在),再判断apk的资源版本是否比本地资源版本高，如果高删除MogoResource和version.xml
-                if (ResourceIndexInfo.Instance.Exist())
-                {
-                    LoggerHelper.Debug("-------------------------Exist ResourceIndexInfo.txt--------------------------");
-                    var localVer = Utils.LoadFile(SystemConfig.VersionPath);
-                    var localVersion = VersionManager.Instance.GetVersionInXML(localVer);
+        //var loadCfgSuccess = SystemConfig.Init();
+        //if (!loadCfgSuccess)
+        //{
+        //    ForwardLoadingMsgBox.Instance.ShowRetryMsgBox(DefaultUI.dataMap[53].content, (isOk) =>
+        //    {
+        //        if (isOk)
+        //            DoInit();
+        //        else
+        //            Application.Quit();
+        //    });
+        //    return;
+        //}
+        //if (SystemSwitch.ReleaseMode)
+        //{
+        //    //第一次导出资源
+        //    ResourceIndexInfo.Instance.Init(Application.streamingAssetsPath + "/ResourceIndexInfo.txt", () =>
+        //    {
+        //        //如果是完整包(判断ResourceIndexInfo.txt是否存在),再判断apk的资源版本是否比本地资源版本高，如果高删除MogoResource和version.xml
+        //        if (ResourceIndexInfo.Instance.Exist())
+        //        {
+        //            LoggerHelper.Debug("-------------------------Exist ResourceIndexInfo.txt--------------------------");
+        //            var localVer = Utils.LoadFile(SystemConfig.VersionPath);
+        //            var localVersion = VersionManager.Instance.GetVersionInXML(localVer);
 
-                    var pkgVer = Resources.Load(SystemConfig.VERSION_URL_KEY) as TextAsset;
-                    var pkgVersion = VersionManager.Instance.GetVersionInXML(pkgVer.text);
-                    if (pkgVersion.ResouceVersionInfo.Compare(localVersion.ResouceVersionInfo) > 0)
-                    {
-                        //删除version.xml
-                        if (File.Exists(SystemConfig.VersionPath))
-                            File.Delete(SystemConfig.VersionPath);
-                        //删除MogoResource文件夹
-                        var mogoResroucesPath = SystemConfig.ResourceFolder.Substring(0, SystemConfig.ResourceFolder.Length - 1);
-                        if (Directory.Exists(mogoResroucesPath))
-                            Directory.Delete(mogoResroucesPath, true);
-                        //删除后再导出version
-                        if (!File.Exists(SystemConfig.VersionPath))
-                        {
-                            var ver = Resources.Load(SystemConfig.VERSION_URL_KEY) as TextAsset;
-                            if (ver != null)
-                                XMLParser.SaveText(SystemConfig.VersionPath, ver.text);
-                        }
-                    }
-                }
-                var go = new StreamingAssetManager();
-                go.AllFinished = () =>
-                {
-                    LoggerHelper.Debug("firstExport finish,start checkversion");
-                    if (SystemSwitch.UseFileSystem)
-                    {
-                        try
-                        {
-                            MogoFileSystem.Instance.Init();
-                        }
-                        catch (Exception ex)
-                        {
-                            LoggerHelper.Except(ex);
-                        }
-                    }
-                    VersionManager.Instance.Init();
-                    VersionManager.Instance.LoadLocalVersion();
-                    CheckVersion(CheckVersionFinish);
-                };
-                go.FirstExport();
-            });
-        }
-        else
-        {
-            SystemConfig.LoadServerList();
-            VersionManager.Instance.Init();
-            VersionManager.Instance.LoadLocalVersion();
-            //UnityEngineInternal.APIUpdaterRuntimeServices.AddComponent(gameObject, "Assets\Plugins\Init\Driver.cs (186,13)", "MogoInitialize");
-            IsRunOnAndroid = false;
-            gameObject.AddComponent<PlatformSdkManager>();
-        }
+        //            var pkgVer = Resources.Load(SystemConfig.VERSION_URL_KEY) as TextAsset;
+        //            var pkgVersion = VersionManager.Instance.GetVersionInXML(pkgVer.text);
+        //            if (pkgVersion.ResouceVersionInfo.Compare(localVersion.ResouceVersionInfo) > 0)
+        //            {
+        //                //删除version.xml
+        //                if (File.Exists(SystemConfig.VersionPath))
+        //                    File.Delete(SystemConfig.VersionPath);
+        //                //删除MogoResource文件夹
+        //                var mogoResroucesPath = SystemConfig.ResourceFolder.Substring(0, SystemConfig.ResourceFolder.Length - 1);
+        //                if (Directory.Exists(mogoResroucesPath))
+        //                    Directory.Delete(mogoResroucesPath, true);
+        //                //删除后再导出version
+        //                if (!File.Exists(SystemConfig.VersionPath))
+        //                {
+        //                    var ver = Resources.Load(SystemConfig.VERSION_URL_KEY) as TextAsset;
+        //                    if (ver != null)
+        //                        XMLParser.SaveText(SystemConfig.VersionPath, ver.text);
+        //                }
+        //            }
+        //        }
+        //        var go = new StreamingAssetManager();
+        //        go.AllFinished = () =>
+        //        {
+        //            LoggerHelper.Debug("firstExport finish,start checkversion");
+        //            if (SystemSwitch.UseFileSystem)
+        //            {
+        //                try
+        //                {
+        //                    MogoFileSystem.Instance.Init();
+        //                }
+        //                catch (Exception ex)
+        //                {
+        //                    LoggerHelper.Except(ex);
+        //                }
+        //            }
+        //            VersionManager.Instance.Init();
+        //            VersionManager.Instance.LoadLocalVersion();
+        //            CheckVersion(CheckVersionFinish);
+        //        };
+        //        go.FirstExport();
+        //    });
+        //}
+        //else
+        //{
+        SystemConfig.LoadServerList();
+        VersionManager.Instance.Init();
+        VersionManager.Instance.LoadLocalVersion();
+        IsRunOnAndroid = false;
+    
+        //gameObject.AddComponent<MogoInitialize>();
+        gameObject.AddComponent<PlatformSdkManager>();
+        //}
     }
 
-    public void CheckVersionFinish()
+        public void CheckVersionFinish()
     {
         DefaultUI.SetLoadingStatusTip(DefaultUI.dataMap.Get(4).content);//数据读取中
         SystemConfig.LoadServerList();

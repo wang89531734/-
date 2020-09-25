@@ -517,12 +517,6 @@
     <Reference Include="MsgPack">
       <HintPath>F:/完整项目/暗黑战神/Assets/Plugins/Libs/MsgPack.dll</HintPath>
     </Reference>
-    <Reference Include="Common">
-      <HintPath>F:/完整项目/暗黑战神/Assets/Scripts/libs/Common.dll</HintPath>
-    </Reference>
-    <Reference Include="GameData">
-      <HintPath>F:/完整项目/暗黑战神/Assets/Scripts/libs/GameData.dll</HintPath>
-    </Reference>
     <Reference Include="mscorlib">
       <HintPath>D:/Program Files (x86)/2019.3.9f1/Editor/Data/MonoBleedingEdge/lib/mono/4.7.1-api/mscorlib.dll</HintPath>
     </Reference>

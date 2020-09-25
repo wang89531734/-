@@ -10,7 +10,7 @@ namespace Assets.Plugins.Init
         public void OnNotNewVersion(string s)
         {
             LoggerHelper.Debug("---------------NotNewVersion-----------------");
-            gameObject.GetComponent<Driver>().CheckVersionFinish();
+            //gameObject.GetComponent<Driver>().CheckVersionFinish();
         }
         //没有sd卡时
         public void OnNotSDCard(string s)

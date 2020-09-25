@@ -66,9 +66,6 @@
     <Compile Include="Assets\Editor\BuildProjectVersionWizard.cs" />
     <Compile Include="Assets\Editor\BundleExporter.cs" />
     <Compile Include="Assets\Editor\DebugFilter.cs" />
-    <Compile Include="Assets\Editor\ExportGameObjectData\CrockMessageCollecter.cs" />
-    <Compile Include="Assets\Editor\ExportGameObjectData\GameObjectsMessageCollecter.cs" />
-    <Compile Include="Assets\Editor\ExportGameObjectData\NPCMessageCollecter.cs" />
     <Compile Include="Assets\Editor\ExportGear\ExportGear.cs" />
     <Compile Include="Assets\Editor\ExportMissionPathPoint.cs" />
     <Compile Include="Assets\Editor\ExportScenes.cs" />
@@ -339,6 +336,9 @@
     <Reference Include="UnityEditor.WindowsStandalone.Extensions">
       <HintPath>D:/Program Files (x86)/2019.3.9f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEditor.Android.Extensions">
+      <HintPath>D:/Program Files (x86)/2019.3.9f1/Editor/Data/PlaybackEngines/AndroidPlayer/UnityEditor.Android.Extensions.dll</HintPath>
+    </Reference>
     <Reference Include="SyntaxTree.VisualStudio.Unity.Bridge">
       <HintPath>C:/Program Files (x86)/Microsoft Visual Studio Tools for Unity/15.0/Editor/SyntaxTree.VisualStudio.Unity.Bridge.dll</HintPath>
     </Reference>
@@ -350,12 +350,6 @@
     </Reference>
     <Reference Include="MsgPack">
       <HintPath>F:/完整项目/暗黑战神/Assets/Plugins/Libs/MsgPack.dll</HintPath>
-    </Reference>
-    <Reference Include="Common">
-      <HintPath>F:/完整项目/暗黑战神/Assets/Scripts/libs/Common.dll</HintPath>
-    </Reference>
-    <Reference Include="GameData">
-      <HintPath>F:/完整项目/暗黑战神/Assets/Scripts/libs/GameData.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
       <HintPath>F:/完整项目/暗黑战神/Library/PackageCache/com.unity.ext.nunit@1.0.0/net35/unity-custom/nunit.framework.dll</HintPath>
@@ -719,10 +713,6 @@
     <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
       <Project>{2236BC7B-0373-1EF3-90AC-CEC93625F911}</Project>
       <Name>Assembly-CSharp-firstpass</Name>
-    </ProjectReference>
-    <ProjectReference Include="Assembly-CSharp.csproj">
-      <Project>{E815DD59-9E79-3B34-01B5-CD7EA1DD12B6}</Project>
-      <Name>Assembly-CSharp</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
